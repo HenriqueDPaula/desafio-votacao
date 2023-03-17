@@ -1,10 +1,6 @@
 package com.sicredi.desafiovotacao.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.Column;
@@ -22,6 +18,7 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode
 @Entity
 @Table(name = "SESSAO")
 public class SessionTable {
@@ -52,5 +49,17 @@ public class SessionTable {
     @Column(name = "CONTAGEM_VOTOS_CONTRA", nullable = false)
     @Min(0)
     private int countAgainst;
+
+    public void appendVote(String voteDescription) {
+        if (isVoteInFavor(voteDescription)) {
+            this.countFavor ++;
+        } else {
+            this.countAgainst ++;
+        }
+    }
+
+    private boolean isVoteInFavor(String voteDescription) {
+        return voteDescription.toLowerCase().startsWith("s");
+    }
 
 }
