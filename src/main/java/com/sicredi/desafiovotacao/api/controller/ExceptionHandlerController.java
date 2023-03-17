@@ -1,8 +1,7 @@
 package com.sicredi.desafiovotacao.api.controller;
 
 import com.sicredi.desafiovotacao.api.controller.v1.session.dto.SessionResponse;
-import com.sicredi.desafiovotacao.usecase.exception.EntityNotFoundException;
-import com.sicredi.desafiovotacao.usecase.exception.InvalidDateException;
+import com.sicredi.desafiovotacao.usecase.exception.*;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,10 +34,22 @@ public class ExceptionHandlerController {
         return buildSessionResponse(HttpStatus.BAD_REQUEST, ex);
     }
 
+    @ExceptionHandler(InvalidVoteOptionException.class)
+    @ResponseBody
+    public ResponseEntity<ExceptionResponse> processInvalidVoteOption(final InvalidVoteOptionException ex) {
+        return buildExceptionResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
+
     @ExceptionHandler(EntityNotFoundException.class)
     @ResponseBody
     public ResponseEntity<ExceptionResponse> processEntityNotFoundException(final EntityNotFoundException ex) {
         return buildExceptionResponse(HttpStatus.NOT_FOUND, ex.getMessage());
+    }
+
+    @ExceptionHandler({ClosedSessionException.class, UniqueVoteViolationException.class})
+    @ResponseBody
+    public ResponseEntity<ExceptionResponse> processEntityNotFoundException(final Exception ex) {
+        return buildExceptionResponse(HttpStatus.NOT_ACCEPTABLE, ex.getMessage());
     }
 
     private ResponseEntity<ExceptionResponse> buildExceptionResponse(HttpStatus status, String message) {
