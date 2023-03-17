@@ -1,11 +1,21 @@
-spring:
+  spring:
 
-  mvc:
-    pathmatch:
-      matching-strategy: ant_path_matcher
+    mvc:
+      pathmatch:
+        matching-strategy: ant_path_matcher
 
-  datasource:
-    url: jdbc:postgresql://localhost:5432/postgres
-    username: postgres
-    password: Postgres2023!
-    driver-class-name: org.postgresql.Driver
+    datasource:
+      url: jdbc:postgresql://localhost:5432/postgres
+      username: postgres
+      password: Postgres2023!
+      driver-class-name: org.postgresql.Driver
+
+  feign:
+    client:
+      config:
+        default:
+          connectTimeout: 5000
+          readTimeout: 5000
+
+  validator-api:
+    url: localhost:8080
