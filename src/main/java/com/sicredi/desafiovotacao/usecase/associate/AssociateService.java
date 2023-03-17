@@ -7,7 +7,9 @@ import com.sicredi.desafiovotacao.usecase.associate.repository.AssociateReposito
 import com.sicredi.desafiovotacao.usecase.exception.ClosedSessionException;
 import com.sicredi.desafiovotacao.usecase.exception.UniqueVoteViolationException;
 import com.sicredi.desafiovotacao.usecase.session.SessionService;
+
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

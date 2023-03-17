@@ -19,6 +19,8 @@ public final class MessagesConstants {
 
     public static final String INVALID_VOTE_OPTION = String.format("Voto deve ser contabilizado como: %s", voteOptions);
 
+
+    public static final String TOPIC_CREATE_MESSAGE = "Pauta %s criado com sucesso!";
     public static final String SESSION_CREATE_MESSAGE = "Sessão criada com sucesso!";
     public static final String VOTE_SUCCESSFULLY = "Voto realizado com sucesso!";
 

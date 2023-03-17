@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static com.sicredi.desafiovotacao.common.MessagesConstants.TOPIC_NOT_FOUND;
@@ -38,7 +39,7 @@ public class TopicService {
     private TopicTable buildTopicEntity(TopicRequest topicRequest) {
         return TopicTable.builder()
                 .subject(topicRequest.getSubject())
-                .creationDate(topicRequest.getCreationDate())
+                .creationDate(LocalDateTime.now())
                 .build();
     }
 
