@@ -3,10 +3,11 @@ package com.sicredi.desafiovotacao.usecase.session;
 import com.sicredi.desafiovotacao.api.controller.v1.session.dto.SessionRequest;
 import com.sicredi.desafiovotacao.api.controller.v1.session.dto.SessionResponse;
 import com.sicredi.desafiovotacao.entity.SessionTable;
+import com.sicredi.desafiovotacao.entity.TopicTable;
 import com.sicredi.desafiovotacao.usecase.exception.EntityNotFoundException;
 import com.sicredi.desafiovotacao.usecase.exception.InvalidDateException;
 import com.sicredi.desafiovotacao.usecase.session.repository.SessionRepository;
-import com.sicredi.desafiovotacao.usecase.topic.repository.TopicRepository;
+import com.sicredi.desafiovotacao.usecase.topic.TopicService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,23 +17,19 @@ import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 import java.util.Optional;
 
+import static com.sicredi.desafiovotacao.common.MessagesConstants.*;
+
 @Service
 @Slf4j
 public class SessionService {
 
-    private static final String INVALID_DATE_BETWEEN = "inicio_sessao deve ser inferior a fim_sessao";
-    private static final String INVALID_DATE_START = "inicio_sessao deve ser superior a data atual";
-    private static final String TOPIC_NOT_FOUND = "Pauta %s não encontrada na base";
-
-    private static final String SESSION_CREATE_MESSAGE = "Sessão criada com sucesso!";
-
     private final SessionRepository sessionRepository;
-    private final TopicRepository topicRepository;
+    private final TopicService topicService;
 
     @Autowired
-    public SessionService(SessionRepository sessionRepository, TopicRepository topicRepository) {
+    public SessionService(SessionRepository sessionRepository, TopicService topicService) {
         this.sessionRepository = sessionRepository;
-        this.topicRepository = topicRepository;
+        this.topicService = topicService;
     }
 
     public Optional<SessionResponse> createSession(SessionRequest sessionRequest) {
@@ -52,8 +49,7 @@ public class SessionService {
         validateSessionDate(sessionRequest);
 
         return SessionTable.builder()
-                .topic(this.topicRepository.findById(sessionRequest.getTopicId())
-                        .orElseThrow(() -> new EntityNotFoundException(String.format(TOPIC_NOT_FOUND, sessionRequest.getTopicId()))))
+                .topic(this.findTopicById(sessionRequest.getTopicId()))
                 .creationDate(LocalDateTime.now())
                 .startDate(sessionRequest.getStartDate())
                 .endDate(sessionRequest.getEndDate())
@@ -63,6 +59,10 @@ public class SessionService {
     private SessionResponse buildSessionResponse(SessionTable sessionTable) {
         return SessionResponse.of(sessionTable.getId(), SESSION_CREATE_MESSAGE, sessionTable.getStartDate(),
                 sessionTable.getEndDate());
+    }
+
+    private TopicTable findTopicById(String topicId) {
+        return this.topicService.findById(topicId);
     }
 
     /**
@@ -95,5 +95,22 @@ public class SessionService {
 
         sessionRequest.setStartDate(startDate);
         sessionRequest.setEndDate(endDate);
+    }
+
+    public SessionTable findById(String sessionId) {
+        return this.sessionRepository.findById(sessionId)
+                .orElseThrow(() -> new EntityNotFoundException(String.format(SESSION_NOT_FOUND, sessionId)));
+    }
+
+    public boolean isSessionOpen(SessionTable sessionTable) {
+        LocalDateTime startDate = sessionTable.getStartDate();
+        LocalDateTime endDate = sessionTable.getEndDate();
+        LocalDateTime currentDate = LocalDateTime.now();
+
+        return startDate.isBefore(currentDate) && endDate.isAfter(currentDate);
+    }
+
+    public void updateSession(SessionTable sessionTable) {
+        this.persistSession(sessionTable);
     }
 }

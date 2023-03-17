@@ -1,15 +1,16 @@
 package com.sicredi.desafiovotacao.usecase.topic;
 
 import com.sicredi.desafiovotacao.api.controller.v1.topic.dto.TopicRequest;
-import com.sicredi.desafiovotacao.driver.kafka.producer.TopicKafkaProducer;
 import com.sicredi.desafiovotacao.entity.TopicTable;
+import com.sicredi.desafiovotacao.usecase.exception.EntityNotFoundException;
 import com.sicredi.desafiovotacao.usecase.topic.repository.TopicRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
+
+import static com.sicredi.desafiovotacao.common.MessagesConstants.TOPIC_NOT_FOUND;
 
 @Service
 @Slf4j
@@ -22,7 +23,6 @@ public class TopicService {
         this.topicRepository = topicRepository;
     }
 
-    @Transactional
     public Optional<String> createTopic(TopicRequest topicRequest) {
         return Optional.of(topicRequest)
                 .map(this::buildTopicEntity)
@@ -40,6 +40,11 @@ public class TopicService {
                 .subject(topicRequest.getSubject())
                 .creationDate(topicRequest.getCreationDate())
                 .build();
+    }
+
+    public TopicTable findById(String topicId) {
+        return this.topicRepository.findById(topicId).orElseThrow(() ->
+                new EntityNotFoundException(String.format(TOPIC_NOT_FOUND, topicId)));
     }
 
 }
