@@ -1,10 +1,16 @@
 package com.sicredi.desafiovotacao.api.controller.v1.topic.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.*;
+
+import io.swagger.annotations.ApiModelProperty;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @Getter
@@ -15,9 +21,9 @@ public class TopicRequest {
 
     @NotBlank(message = "assunto não deve ser vazio")
     @JsonProperty(value = "assunto")
+    @ApiModelProperty(notes = "Assunto da Pauta em questão", example = "Aumento salarial da diretoria", required = true)
     private String subject;
 
-    @NotNull(message = "data_pauta não deve ser null")
-    @JsonProperty("data_pauta")
+    @JsonIgnore
     private LocalDateTime creationDate;
 }

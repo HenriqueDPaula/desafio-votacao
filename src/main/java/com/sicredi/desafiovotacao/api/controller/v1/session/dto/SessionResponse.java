@@ -1,6 +1,7 @@
 package com.sicredi.desafiovotacao.api.controller.v1.session.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -1,15 +1,18 @@
 package com.sicredi.desafiovotacao.api.controller.v1.topic.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.*;
-import org.springframework.hateoas.RepresentationModel;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class TopicResponse {
 
     @JsonProperty(value = "pauta_id")
@@ -22,9 +25,5 @@ public class TopicResponse {
 
     public static TopicResponse of(String id, LocalDateTime creationDate, String message) {
         return new TopicResponse(id, creationDate, message);
-    }
-
-    public static TopicResponse createEmptyResponse() {
-        return new TopicResponse();
     }
 }

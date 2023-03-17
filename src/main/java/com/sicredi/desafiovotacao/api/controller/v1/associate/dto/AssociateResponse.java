@@ -2,9 +2,9 @@ package com.sicredi.desafiovotacao.api.controller.v1.associate.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.sicredi.desafiovotacao.usecase.associate.AssociateService;
+
 import com.sicredi.desafiovotacao.usecase.associate.enums.VoteStatusEnum;
-import lombok.AllArgsConstructor;
+
 import lombok.Getter;
 import lombok.Setter;
 
