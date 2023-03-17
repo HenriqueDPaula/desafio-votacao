@@ -4,8 +4,7 @@ services:
   postgres:
     image: postgres
     volumes:
-      - ./scripts/db/PAUTA.sql:/docker-entrypoint-initdb.d/PAUTA.sql
-      - ./scripts/db/SESSAO.sql:/docker-entrypoint-initdb.d/SESSAO.sql
+      - ./scripts/db/DESAFIO_VOTACAO_DDL.sql:/docker-entrypoint-initdb.d/DESAFIO_VOTACAO_DDL.sql
     environment:
       POSTGRES_PASSWORD: "Postgres2023!"
     ports:
