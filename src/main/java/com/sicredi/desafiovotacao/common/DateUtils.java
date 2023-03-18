@@ -10,6 +10,6 @@ import java.time.ZoneId;
 public class DateUtils {
 
     public static LocalDateTime currentDate() {
-        return LocalDateTime.now(ZoneId.of("UTC"));
+        return LocalDateTime.now();
     }
 }
