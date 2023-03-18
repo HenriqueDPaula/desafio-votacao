@@ -1,6 +1,7 @@
 package com.sicredi.desafiovotacao.usecase.topic;
 
 import com.sicredi.desafiovotacao.api.controller.v1.topic.dto.TopicRequest;
+import com.sicredi.desafiovotacao.common.DateUtils;
 import com.sicredi.desafiovotacao.entity.TopicTable;
 import com.sicredi.desafiovotacao.usecase.exception.EntityNotFoundException;
 import com.sicredi.desafiovotacao.usecase.topic.repository.TopicRepository;
@@ -33,13 +34,18 @@ public class TopicService {
 
     private TopicTable persistTopic(TopicTable topicTable) {
         log.info("m=persistTopic l=PERSIST_TOPIC topicTable={}", topicTable);
-        return this.topicRepository.save(topicTable);
+
+        try {
+            return this.topicRepository.save(topicTable);
+        } catch (Exception e) {
+            throw new RuntimeException("Error to persist topic", e);
+        }
     }
 
     private TopicTable buildTopicEntity(TopicRequest topicRequest) {
         return TopicTable.builder()
                 .subject(topicRequest.getSubject())
-                .creationDate(LocalDateTime.now())
+                .creationDate(DateUtils.currentDate())
                 .build();
     }
 

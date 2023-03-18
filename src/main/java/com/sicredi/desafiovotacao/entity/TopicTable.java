@@ -18,7 +18,8 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "PAUTA")
 @ToString
-public final class TopicTable {
+@EqualsAndHashCode
+public class TopicTable {
 
     @Id
     @Column(name = "ID", nullable = false, unique = true)

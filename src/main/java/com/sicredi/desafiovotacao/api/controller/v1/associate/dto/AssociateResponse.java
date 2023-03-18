@@ -3,6 +3,7 @@ package com.sicredi.desafiovotacao.api.controller.v1.associate.dto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import com.sicredi.desafiovotacao.common.DateUtils;
 import com.sicredi.desafiovotacao.usecase.associate.enums.VoteStatusEnum;
 
 import lombok.Getter;
@@ -30,7 +31,7 @@ public class AssociateResponse {
     }
 
     public static AssociateResponse of(VoteStatusEnum voteStatusEnum, String message) {
-        return new AssociateResponse(voteStatusEnum.getDescription(), message, LocalDateTime.now());
+        return new AssociateResponse(voteStatusEnum.getDescription(), message, DateUtils.currentDate());
     }
 
     public static AssociateResponse createUnableResponse() {

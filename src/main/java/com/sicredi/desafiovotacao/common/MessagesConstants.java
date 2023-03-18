@@ -16,7 +16,6 @@ public final class MessagesConstants {
     public static final String SESSION_NOT_FOUND = "Sessão não encontrada na base";
     public static final String CLOSED_SESSION_ERROR = "Sessão {%s} encontra-se encerrada";
     public static final String UNIQUE_VOTE_CONSTRAINT = "Associado já possui voto registrado para a sessão {%s}";
-
     public static final String INVALID_VOTE_OPTION = String.format("Voto deve ser contabilizado como: %s", voteOptions);
 
 

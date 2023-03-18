@@ -2,6 +2,7 @@ package com.sicredi.desafiovotacao.api.controller.v1.topic;
 
 import com.sicredi.desafiovotacao.api.controller.v1.topic.dto.TopicRequest;
 import com.sicredi.desafiovotacao.api.controller.v1.topic.dto.TopicResponse;
+import com.sicredi.desafiovotacao.common.DateUtils;
 import com.sicredi.desafiovotacao.usecase.topic.TopicService;
 
 import io.swagger.annotations.ApiOperation;
@@ -42,7 +43,7 @@ public class TopicController {
         String id = topicService.createTopic(topicRequest).orElse(EMPTY);
 
         return new ResponseEntity<>(
-                TopicResponse.of(id, LocalDateTime.now(), String.format(TOPIC_CREATE_MESSAGE, topicRequest.getSubject())),
+                TopicResponse.of(id, DateUtils.currentDate(), String.format(TOPIC_CREATE_MESSAGE, topicRequest.getSubject())),
                 CREATED);
 
     }

@@ -24,7 +24,7 @@ public class SessionRequest {
     private String topicId;
 
     @JsonProperty(value = "inicio_sessao")
-    @ApiModelProperty(notes = "Data de abertuda da sessão, valor padrão caso não informado será de 5 minutos " +
+    @ApiModelProperty(notes = "Data de abertuda da sessão, valor padrão caso não informado será de 1 minuto " +
             "a partir da requisição", example = "2023-17-20T20:30:55")
     private LocalDateTime startDate;
 

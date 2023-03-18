@@ -2,6 +2,7 @@ package com.sicredi.desafiovotacao.usecase.session;
 
 import com.sicredi.desafiovotacao.api.controller.v1.session.dto.SessionRequest;
 import com.sicredi.desafiovotacao.api.controller.v1.session.dto.SessionResponse;
+import com.sicredi.desafiovotacao.common.DateUtils;
 import com.sicredi.desafiovotacao.entity.SessionTable;
 import com.sicredi.desafiovotacao.entity.TopicTable;
 import com.sicredi.desafiovotacao.usecase.exception.EntityNotFoundException;
@@ -50,7 +51,7 @@ public class SessionService {
 
         return SessionTable.builder()
                 .topic(this.findTopicById(sessionRequest.getTopicId()))
-                .creationDate(LocalDateTime.now())
+                .creationDate(DateUtils.currentDate())
                 .startDate(sessionRequest.getStartDate())
                 .endDate(sessionRequest.getEndDate())
                 .build();
@@ -66,7 +67,7 @@ public class SessionService {
     }
 
     /**
-     * Caso não seja informado a data de inicio, a sessão é aberta em 5 minutos.
+     * Caso não seja informado a data de inicio, a sessão é aberta em 1 minuto.
      * Caso não seja informado a data de fim, a sessão dura 1 minuto.
      * @param sessionRequest
      *
@@ -78,7 +79,7 @@ public class SessionService {
         LocalDateTime endDate = sessionRequest.getEndDate();
 
         if (Objects.isNull(startDate)) {
-            startDate = LocalDateTime.now().plus(5, ChronoUnit.MINUTES);
+            startDate = DateUtils.currentDate().plus(1, ChronoUnit.MINUTES);
         }
 
         if (Objects.isNull(endDate)) {
@@ -89,7 +90,7 @@ public class SessionService {
             throw new InvalidDateException(INVALID_DATE_BETWEEN, startDate, endDate);
         }
 
-        if (startDate.isBefore(LocalDateTime.now())) {
+        if (startDate.isBefore(DateUtils.currentDate())) {
             throw new InvalidDateException(INVALID_DATE_START, startDate, endDate);
         }
 
@@ -105,7 +106,7 @@ public class SessionService {
     public boolean isSessionOpen(SessionTable sessionTable) {
         LocalDateTime startDate = sessionTable.getStartDate();
         LocalDateTime endDate = sessionTable.getEndDate();
-        LocalDateTime currentDate = LocalDateTime.now();
+        LocalDateTime currentDate = DateUtils.currentDate();
 
         return startDate.isBefore(currentDate) && endDate.isAfter(currentDate);
     }
