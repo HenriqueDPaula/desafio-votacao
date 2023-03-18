@@ -9,14 +9,16 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.Optional;
+import java.util.function.Predicate;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 import static org.springframework.http.HttpStatus.CREATED;
 
 @RestController
@@ -41,6 +43,23 @@ public class SessionController {
     public ResponseEntity<SessionResponse> create(@RequestBody @Valid SessionRequest sessionRequest) {
         SessionResponse sessionResponse = this.sessionService.createSession(sessionRequest)
                 .orElse(SessionResponse.createEmptyResponse());
+
+        Optional.of(sessionResponse.getSessionId())
+                .filter(Predicate.not(String::isBlank))
+                .ifPresent(id -> {
+                    sessionResponse.add(linkTo(methodOn(this.getClass())
+                            .getResult(id)).withRel("resultado"));
+                });
+
         return new ResponseEntity<>(sessionResponse, CREATED);
+    }
+
+    @GetMapping("/resultado/{id}")
+    public ResponseEntity<SessionResponse.SessionResponseResult> getResult(@PathVariable(value = "id") String id) {
+
+        SessionResponse.SessionResponseResult sessionResponseResult =
+                this.sessionService.getResult(id);
+
+        return new ResponseEntity<>(sessionResponseResult, HttpStatus.OK);
     }
 }
