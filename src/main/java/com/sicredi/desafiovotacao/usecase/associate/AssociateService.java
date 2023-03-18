@@ -32,28 +32,33 @@ public class AssociateService {
         this.associateRepository = associateRepository;
     }
 
-    public void executeVote(AssociateRequest associateRequest) {
+    public String executeVote(AssociateRequest associateRequest) {
 
         SessionTable session = this.sessionService.findById(associateRequest.getSessionId());
+        String associateId;
 
         if (this.sessionService.isSessionOpen(session)) {
-            processAssociate(associateRequest, session);
+            associateId = processAssociate(associateRequest, session);
             updateSession(session, associateRequest);
         } else {
             throw new ClosedSessionException(String.format(CLOSED_SESSION_ERROR, associateRequest.getSessionId()));
         }
+
+        return associateId;
     }
 
-    private void processAssociate(AssociateRequest associateRequest, SessionTable session) {
+    private String processAssociate(AssociateRequest associateRequest, SessionTable session) {
         Optional<AssociateTable> associateTable = this.retrieveAssociate(associateRequest, session);
 
         if (associateTable.isEmpty()) {
-            insertNewAssociate(associateRequest, session);
+            return insertNewAssociate(associateRequest, session);
         } else {
             associateTable
                     .filter(associate -> this.isAssociateUniqueVote(associate, session))
                     .orElseThrow(
                             () -> new UniqueVoteViolationException(String.format(UNIQUE_VOTE_CONSTRAINT, session.getId())));
+
+            return associateTable.get().getId();
         }
     }
 
@@ -63,9 +68,10 @@ public class AssociateService {
                 .orElse(this.associateRepository.findByCpf(associateRequest.getCpf()));
     }
 
-    private void insertNewAssociate(AssociateRequest associateRequest, SessionTable session) {
+    private String insertNewAssociate(AssociateRequest associateRequest, SessionTable session) {
         AssociateTable associateTable = buildAssociateEntity(associateRequest, session);
         persistAssociate(associateTable);
+        return associateTable.getId();
     }
 
     private AssociateTable buildAssociateEntity(AssociateRequest associateRequest, SessionTable sessionTable) {
