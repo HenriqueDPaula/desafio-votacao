@@ -15,6 +15,10 @@ import java.time.LocalDateTime;
 @Setter
 public class AssociateResponse {
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JsonProperty(value = "associado_id")
+    private String associateId;
+
     private String status;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -24,18 +28,19 @@ public class AssociateResponse {
     @JsonProperty(value = "data_votacao")
     private LocalDateTime voteDate;
 
-    private AssociateResponse(String voteStatus, String message, LocalDateTime voteDate) {
+    private AssociateResponse(String associateId, String voteStatus, String message, LocalDateTime voteDate) {
+        this.associateId = associateId;
         this.status = voteStatus;
         this.message = message;
         this.voteDate = voteDate;
     }
 
-    public static AssociateResponse of(VoteStatusEnum voteStatusEnum, String message) {
-        return new AssociateResponse(voteStatusEnum.getDescription(), message, DateUtils.currentDate());
+    public static AssociateResponse of(String associateId, VoteStatusEnum voteStatusEnum, String message) {
+        return new AssociateResponse(associateId, voteStatusEnum.getDescription(), message, DateUtils.currentDate());
     }
 
     public static AssociateResponse createUnableResponse() {
-        return new AssociateResponse(VoteStatusEnum.UNABLE.getDescription(), null, null);
+        return new AssociateResponse(null, VoteStatusEnum.UNABLE.getDescription(), null, null);
     }
 
 }
