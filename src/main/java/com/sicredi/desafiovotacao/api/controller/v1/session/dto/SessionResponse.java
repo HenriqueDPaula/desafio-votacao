@@ -1,11 +1,10 @@
 package com.sicredi.desafiovotacao.api.controller.v1.session.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import org.springframework.hateoas.RepresentationModel;
 
 import java.time.LocalDateTime;
 
@@ -13,9 +12,10 @@ import java.time.LocalDateTime;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class SessionResponse {
+public class SessionResponse extends RepresentationModel<SessionResponse> {
 
     @JsonProperty(value = "sessao_id")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String sessionId;
 
     private String message;
@@ -34,4 +34,20 @@ public class SessionResponse {
         return new SessionResponse();
     }
 
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    public static class SessionResponseResult {
+
+        @JsonProperty(value = "resultado")
+        private String result;
+
+        @JsonProperty(value = "contagem_sim")
+        private int countYes;
+
+        @JsonProperty(value = "contagem_nao")
+        private int countNo;
+
+    }
 }
+
