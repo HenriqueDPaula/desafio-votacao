@@ -52,13 +52,15 @@ public class AssociateController {
 
         if (Objects.isNull(associateRequest.getId())) {
 
-            associateService.executeVote(associateRequest);
-            return new ResponseEntity<>(AssociateResponse.of(VoteStatusEnum.ABLE, VOTE_SUCCESSFULLY), HttpStatus.OK);
+            String associateId = associateService.executeVote(associateRequest);
+            return new ResponseEntity<>(
+                    AssociateResponse.of(associateId, VoteStatusEnum.ABLE, VOTE_SUCCESSFULLY), HttpStatus.OK);
 
         } else if (this.validatorApiService.isValidCpf(associateRequest.getCpf())) {
 
-            associateService.executeVote(associateRequest);
-            return new ResponseEntity<>(AssociateResponse.of(VoteStatusEnum.ABLE, VOTE_SUCCESSFULLY), HttpStatus.OK);
+            String associateId = associateService.executeVote(associateRequest);
+            return new ResponseEntity<>(
+                    AssociateResponse.of(associateId, VoteStatusEnum.ABLE, VOTE_SUCCESSFULLY), HttpStatus.OK);
 
         }
         return new ResponseEntity<>(AssociateResponse.createUnableResponse(), HttpStatus.NOT_ACCEPTABLE);
