@@ -19,6 +19,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import static com.sicredi.desafiovotacao.common.MessagesConstants.*;
+import static com.sicredi.desafiovotacao.usecase.session.ResultSessionEnum.*;
 
 @Service
 @Slf4j
@@ -96,6 +97,29 @@ public class SessionService {
 
         sessionRequest.setStartDate(startDate);
         sessionRequest.setEndDate(endDate);
+    }
+
+    public SessionResponse.SessionResponseResult getResult(String sessionId) {
+        SessionTable sessionTable = findById(sessionId);
+
+        int countYes = sessionTable.getCountFavor();
+        int countNo = sessionTable.getCountAgainst();
+
+        return SessionResponse.SessionResponseResult.builder()
+                .countYes(countYes)
+                .countNo(countNo)
+                .result(getSessionResult(countYes, countNo))
+                .build();
+    }
+
+    private String getSessionResult(int countYes, int countNo) {
+        if (countYes > countNo) {
+            return APPROVED.getDescription();
+        } else if (countYes == countNo) {
+            return DRAW.getDescription();
+        }
+
+        return DENIED.getDescription();
     }
 
     public SessionTable findById(String sessionId) {
