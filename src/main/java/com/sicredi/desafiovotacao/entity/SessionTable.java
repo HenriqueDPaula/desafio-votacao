@@ -1,5 +1,7 @@
 package com.sicredi.desafiovotacao.entity;
 
+import com.sicredi.desafiovotacao.api.controller.v1.session.dto.SessionRequest;
+import com.sicredi.desafiovotacao.common.DateUtils;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -19,6 +21,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode
+@ToString
 @Entity
 @Table(name = "SESSAO")
 public class SessionTable {
@@ -49,6 +52,20 @@ public class SessionTable {
     @Column(name = "CONTAGEM_VOTOS_CONTRA", nullable = false)
     @Min(0)
     private int countAgainst;
+
+    public static SessionTable of(TopicTable topicTable, SessionRequest sessionRequest) {
+        return SessionTable.builder()
+                .topic(topicTable)
+                .creationDate(DateUtils.currentDate())
+                .startDate(sessionRequest.getStartDate())
+                .endDate(sessionRequest.getEndDate())
+                .build();
+    }
+
+    public boolean isOpen() {
+        var currentDate = DateUtils.currentDate();
+        return startDate.isBefore(currentDate) && endDate.isAfter(currentDate);
+    }
 
     public void appendVote(String voteDescription) {
         if (isVoteInFavor(voteDescription)) {

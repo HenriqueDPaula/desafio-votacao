@@ -1,16 +1,24 @@
 package com.sicredi.desafiovotacao.usecase.session;
 
+import com.sicredi.desafiovotacao.BaseContextConfigurationTest;
+import com.sicredi.desafiovotacao.api.controller.v1.session.dto.SessionRequest;
+import com.sicredi.desafiovotacao.api.controller.v1.session.dto.SessionResponse;
 import com.sicredi.desafiovotacao.common.DateUtils;
 import com.sicredi.desafiovotacao.entity.SessionTable;
 import com.sicredi.desafiovotacao.entity.TopicTable;
 import com.sicredi.desafiovotacao.usecase.exception.EntityNotFoundException;
 import com.sicredi.desafiovotacao.usecase.exception.InvalidDateException;
+import com.sicredi.desafiovotacao.usecase.session.repository.SessionRepository;
+import com.sicredi.desafiovotacao.usecase.topic.repository.TopicRepository;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
+import org.mockito.MockedStatic;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -19,11 +27,25 @@ import java.time.temporal.ChronoUnit;
 
 import static com.sicredi.desafiovotacao.common.MessagesConstants.*;
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.mockStatic;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@ActiveProfiles("test")
-public class SessionServiceTest extends SessionServiceTestSupport {
+public class SessionServiceTest extends BaseContextConfigurationTest {
+
+    @SpyBean
+    private SessionResponse sessionResponse;
+
+    @Autowired
+    private SessionService sessionService;
+
+    @Autowired
+    private SessionRepository sessionRepository;
+
+    @Autowired
+    private TopicRepository topicRepository;
+
+    private TopicTable topicTable;
+
+    private boolean isSessionOpen;
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
@@ -208,5 +230,43 @@ public class SessionServiceTest extends SessionServiceTestSupport {
         SessionTable sessionById = runFindById(sessionId);
 
         assertNull(sessionById);
+    }
+
+    private void runCreateSession(LocalDateTime currentDate, LocalDateTime startDate, LocalDateTime endDate) {
+        // Necessário mockar a hora do sistema
+        try (MockedStatic<DateUtils> dateMock = mockStatic(DateUtils.class)) {
+            dateMock.when(DateUtils::currentDate)
+                    .thenReturn(currentDate);
+
+            var sessionRequest = buildSessionRequest(startDate, endDate);
+
+            this.sessionService.createSession(sessionRequest)
+                    .ifPresent(response -> this.sessionResponse = response);
+        }
+    }
+
+    private void runIsSessionOpen(SessionTable sessionTable, LocalDateTime currentDate) {
+        try (MockedStatic<DateUtils> dateMock = mockStatic(DateUtils.class)) {
+            dateMock.when(DateUtils::currentDate)
+                    .thenReturn(currentDate);
+            isSessionOpen = sessionTable.isOpen();
+        }
+    }
+
+    private SessionTable runFindById(String id) {
+        return this.sessionService.findById(id);
+    }
+
+    private SessionRequest buildSessionRequest(LocalDateTime startDate, LocalDateTime endDate) {
+        return new SessionRequest(this.topicTable.getId(), startDate, endDate);
+    }
+
+    private SessionTable buildSessionTable(LocalDateTime startDate, LocalDateTime endDate) {
+        return SessionTable.builder()
+                .creationDate(DateUtils.currentDate())
+                .topic(this.topicTable)
+                .startDate(startDate)
+                .endDate(endDate)
+                .build();
     }
 }

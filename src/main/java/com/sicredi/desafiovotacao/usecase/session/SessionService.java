@@ -49,13 +49,9 @@ public class SessionService {
     private SessionTable buildSessionEntity(SessionRequest sessionRequest) {
 
         validateSessionDate(sessionRequest);
+        TopicTable topicTable = findTopicById(sessionRequest.getTopicId());
 
-        return SessionTable.builder()
-                .topic(this.findTopicById(sessionRequest.getTopicId()))
-                .creationDate(DateUtils.currentDate())
-                .startDate(sessionRequest.getStartDate())
-                .endDate(sessionRequest.getEndDate())
-                .build();
+        return SessionTable.of(topicTable, sessionRequest);
     }
 
     private SessionResponse buildSessionResponse(SessionTable sessionTable) {
@@ -118,21 +114,12 @@ public class SessionService {
         } else if (countYes == countNo) {
             return DRAW.getDescription();
         }
-
         return DENIED.getDescription();
     }
 
     public SessionTable findById(String sessionId) {
         return this.sessionRepository.findById(sessionId)
                 .orElseThrow(() -> new EntityNotFoundException(String.format(SESSION_NOT_FOUND, sessionId)));
-    }
-
-    public boolean isSessionOpen(SessionTable sessionTable) {
-        LocalDateTime startDate = sessionTable.getStartDate();
-        LocalDateTime endDate = sessionTable.getEndDate();
-        LocalDateTime currentDate = DateUtils.currentDate();
-
-        return startDate.isBefore(currentDate) && endDate.isAfter(currentDate);
     }
 
     public void updateSession(SessionTable sessionTable) {

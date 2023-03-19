@@ -1,5 +1,6 @@
 package com.sicredi.desafiovotacao.usecase.topic;
 
+import com.sicredi.desafiovotacao.BaseContextConfigurationTest;
 import com.sicredi.desafiovotacao.api.controller.v1.topic.dto.TopicRequest;
 import com.sicredi.desafiovotacao.common.DateUtils;
 import com.sicredi.desafiovotacao.entity.TopicTable;
@@ -25,11 +26,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@ActiveProfiles("test")
-public class TopicServiceTest extends TopicServiceTestSupport{
+public class TopicServiceTest extends BaseContextConfigurationTest {
 
+    @SpyBean
+    private TopicRepository topicRepository;
+
+    @Autowired
+    private TopicService topicService;
     @Test
     public void shouldCreateTopicSuccess() {
         // when
@@ -54,6 +57,21 @@ public class TopicServiceTest extends TopicServiceTestSupport{
         // then
         assertTrue(result.isEmpty());
         verify(this.topicRepository, never()).save(any(TopicTable.class));
+    }
 
+    private void runScenario(TopicRequest topicRequest) {
+        this.topicService.createTopic(topicRequest);
+    }
+
+    public TopicRequest buildTopicRequest() {
+        return new TopicRequest("subject", null);
+    }
+
+    private TopicTable buildTopicTable() {
+        TopicTable topicTable = new TopicTable();
+        topicTable.setId("1");
+        topicTable.setSubject("subject");
+        topicTable.setCreationDate(DateUtils.currentDate());
+        return topicTable;
     }
 }

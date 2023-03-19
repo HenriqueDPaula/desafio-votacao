@@ -37,7 +37,7 @@ public class AssociateService {
         SessionTable session = this.sessionService.findById(associateRequest.getSessionId());
         String associateId;
 
-        if (this.sessionService.isSessionOpen(session)) {
+        if (session.isOpen()) {
             associateId = processAssociate(associateRequest, session);
             updateSession(session, associateRequest);
         } else {
@@ -54,7 +54,7 @@ public class AssociateService {
             return insertNewAssociate(associateRequest, session);
         } else {
             associateTable
-                    .filter(associate -> this.isAssociateUniqueVote(associate, session))
+                    .filter(associate -> associate.isUniqueVote(session))
                     .orElseThrow(
                             () -> new UniqueVoteViolationException(String.format(UNIQUE_VOTE_CONSTRAINT, session.getId())));
 
@@ -69,17 +69,9 @@ public class AssociateService {
     }
 
     private String insertNewAssociate(AssociateRequest associateRequest, SessionTable session) {
-        AssociateTable associateTable = buildAssociateEntity(associateRequest, session);
+        AssociateTable associateTable = AssociateTable.of(associateRequest, session);
         persistAssociate(associateTable);
         return associateTable.getId();
-    }
-
-    private AssociateTable buildAssociateEntity(AssociateRequest associateRequest, SessionTable sessionTable) {
-        return AssociateTable.builder()
-                .session(sessionTable)
-                .cpf(associateRequest.getCpf())
-                .agree(associateRequest.getVoteDescription())
-                .build();
     }
 
     private void persistAssociate(AssociateTable associateTable) {
@@ -92,10 +84,6 @@ public class AssociateService {
 
         sessionTable.appendVote(associateRequest.getVoteDescription());
         this.sessionService.updateSession(sessionTable);
-    }
-
-    private boolean isAssociateUniqueVote(AssociateTable associate, SessionTable session) {
-        return !associate.getSession().getId().equals(session.getId());
     }
 
 }
